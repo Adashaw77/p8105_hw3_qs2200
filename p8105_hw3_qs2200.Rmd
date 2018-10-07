@@ -146,3 +146,17 @@ instacart_df %>%
   facet_wrap( ~ department,ncol = 3,scale = "free")
 
 ```
+
+**4. Make a table showing the most popular item aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.**
+```{r problem 2.4}
+instacart_df %>%
+  group_by(aisle, product_name) %>%
+  summarize(item_number = n()) %>%
+  filter(aisle %in% c("baking ingredients", "dog food care",  "packaged vegetables fruits")) %>%
+  filter(item_number == max(item_number)) %>%
+  knitr::kable(digits = 0)
+```
+  
+  
+
+```
