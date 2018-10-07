@@ -1,0 +1,11 @@
+---
+title: "p8105_hw3_qs2200"
+author: "Qi Shao"
+date: "10/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
