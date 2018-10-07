@@ -68,7 +68,7 @@ brfss_tb =
 
 **5.For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.**
 
-```{r problem 1.5}
+```{r problem 1.5, message = FALSE}
 aver_exce = 
   filter(brfss_df, response == "Excellent") %>%
   group_by(state,year) %>%
@@ -117,6 +117,21 @@ aver_exce + aver_very + aver_good + aver_fair + aver_poor
 ## Problem 2 
 
 **1. Import, explore and describe the dataset.**
-```{r problem 2.2}
+```{r problem 2.1}
 instacart_df = p8105.datasets::instacart 
+head(instacart_df)
+```
 
+The dataset is about online purchase order in Instacart. 
+
+There are `r ncol(instacart_df)` variables in the dataset, in which the "eval_set", "aisle", "product_name", "department" are character variables, others are all integer variables.These variables contain the id and category of products in each order, the user and id of an order, the time each order is placed and the time each product is added to the cart and so on.
+
+There are `r nrow(instacart_df)` observations in the dataset, each one represents a product in an order. For example, the first row in the dataset illustrate the order id is 1, the product id is 49302. It is the first product added in cart in order 1, and it has been reordered by the user 112108 in the past.This order belongs to the train evaluation set, and is the 4th order of the user. This order is placed on the 4th day of a week, 10 a.m., and it has been 9 days since last order was placed.The product is Bulgarian Yogurt, in dairy and egg department (id: 16), yogurt aisle(id: 120).
+
+**2. How many aisles are there, and which aisles are the most items ordered from?**
+```{r problem 2.2}
+aisle_max = as.data.frame(table(instacart_df$aisle))%>%
+  filter(Freq == max(Freq)) 
+```
+
+There are `r length(unique(instacart_df$aisle))` alsles there.The aisle "`r aisle_max$Var1`" is the most items ordered from.
