@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(ggplot2)
 library(ggridges)
 library(patchwork)
 library(p8105.datasets)
@@ -14,7 +15,7 @@ library(p8105.datasets)
 
 # Problem 1
 
-** 1. Import and clean the dataset. **
+**1. Import and clean the dataset.**
 ```{r problem 1.1}
 brfss_df = p8105.datasets::brfss_smart2010 %>%
   janitor::clean_names() %>%
@@ -25,13 +26,27 @@ brfss_df = p8105.datasets::brfss_smart2010 %>%
 ##filter(topic == "Overall Health", response ==c("Excellent", "Very good", "Good","Fair", "Poor"))
 ##why can't we filter the rows which response is excellent to poor
 ```
-** 2. In 2002, which states were observed at 7 locations? **
+**2. In 2002, which states were observed at 7 locations?**
 ```{r problem 1.2}
-brfss_sum = 
+brfss_state = 
   group_by(brfss_df , locationabbr) %>%
   summarize(n = n_distinct(locationdesc)) %>%
   filter(n == 7)
-brfss_sum
 ```
 
-The 4 states `r brfss_sum$locationabbr` were observed at 7 locations.
+The 7 states `r brfss_state$locationabbr` were observed at 7 locations.
+
+**3. Make a “spaghetti plot” that shows the number of observations in each state from 2002 to 2010.**
+```{r problem 1.3}
+
+brfss_spa =
+  group_by(brfss_df, locationabbr,year) %>%
+  summarize(n_obs = n())
+
+ggplot(brfss_spa, aes(x = year, y = n_obs, color = locationabbr))+
+  geom_line()+geom_point()+
+  labs(x = "Year",
+    y = "Number of observations")
+
+```
+**
