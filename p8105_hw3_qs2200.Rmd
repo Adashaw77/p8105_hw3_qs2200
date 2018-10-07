@@ -119,7 +119,6 @@ aver_exce + aver_very + aver_good + aver_fair + aver_poor
 **1. Import, explore and describe the dataset.**
 ```{r problem 2.1}
 instacart_df = p8105.datasets::instacart 
-head(instacart_df)
 ```
 
 The dataset is about online purchase order in Instacart. 
@@ -167,5 +166,16 @@ instacart_df %>%
   knitr::kable(digits = 1)
 ```
   
+# Problem 3
+
+**1. Import, explore and describe the dataset.**
+```{r problem 3.1}
+ny_noaa = p8105.datasets::ny_noaa %>%
+  arrange(date)
+head(ny_noaa)
+tail(ny_noaa) 
 
 ```
+This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.
+
+There are `r nrow(ny_noaa)` observations in `r length(unique(ny_noaa$id))` weather stations during the 30 years.
