@@ -193,3 +193,21 @@ ny_noaa_snow =
   filter(n== max(n))
 ```
 For snowfall, `r ny_noaa_snow$snow` is the most commonly observed value, because most of days in 1 year don't snow.
+
+**3. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
+
+```{r problem 3.3}
+
+
+
+```
+
+**4.Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.**
+
+```{r problem 3.4}
+
+
+
+
+```
+
