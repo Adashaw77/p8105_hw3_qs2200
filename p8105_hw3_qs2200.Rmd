@@ -24,32 +24,37 @@ brfss_df = p8105.datasets::brfss_smart2010 %>%
   rename(state = locationabbr) %>%
   arrange(response) 
 
-##filter(topic == "Overall Health", response ==c("Excellent", "Very good", "Good","Fair", "Poor"))
-##why can't we filter the rows which response is excellent to poor
 ```
 **2. In 2002, which states were observed at 7 locations?**
 ```{r problem 1.2}
 brfss_state = 
   group_by(brfss_df , state) %>%
+  filter(year == 2002) %>%
   summarize(n = n_distinct(locationdesc)) %>%
   filter(n == 7)
 ```
 
-The 7 states `r brfss_state$state` were observed at 7 locations.
+The 3 states `r brfss_state$state` were observed at 7 locations.
 
 **3. Make a “spaghetti plot” that shows the number of observations in each state from 2002 to 2010.**
 ```{r problem 1.3}
 
 brfss_spa =
   group_by(brfss_df, state,year) %>%
-  summarize(n_obs = n())
+  summarize(n_obs = n()) %>%
+  arrange(n_obs)
 
 ggplot(brfss_spa, aes(x = year, y = n_obs, color = state))+
   geom_line()+geom_point()+
   labs(x = "Year",
-    y = "Number of observations")
+    y = "Number of observations")+
+  viridis::scale_color_viridis(discrete=TRUE, name = "State", guide = guide_legend(nrow = 5))+
+  theme_bw()+
+  theme(legend.position = "bottom")
 
 ```
+The "spaghetti plot" shows the number of observations in each state from 2002 to 2010. Most of the states have a constant number of observations, but the observation number dramaticly increased in 2007 and 2010, dramaticly decreased in 2008.
+
 **4. Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.**
 
 ```{r problem 1.4}
@@ -65,54 +70,28 @@ brfss_tb =
 
 ```
 
+The table shows the mean and standard deviation of the proportion of "Excellent" responses across locations in NY for the years 2002, 2006 and 2010. We can see that the proportion of "Excellent" is the highest in 2002, and in 2002 also have the highest standard deviation.
 
 **5.For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.**
 
-```{r problem 1.5, message = FALSE}
-aver_exce = 
-  filter(brfss_df, response == "Excellent") %>%
-  group_by(state,year) %>%
-  summarize(mean_prop = mean(data_value)) %>%
-  ggplot(aes(x = year, y = mean_prop, color = state)) +
-  geom_line() +
-  theme(legend.position = "none")
+```{r problem 1.5, warning= FALSE}
 
-aver_very = 
-  filter(brfss_df, response == "Very good") %>%
-  group_by(state,year) %>%
-  summarize(mean_prop = mean(data_value)) %>%
+brfss_df %>%
+  group_by(response, state, year) %>%
+  summarise(mean_prop = mean(data_value)) %>%
   ggplot(aes(x = year, y = mean_prop, color = state)) +
-  geom_line() +
-  theme(legend.position = "none")
-
-aver_good = 
-  filter(brfss_df, response == "Good") %>%
-  group_by(state,year) %>%
-  summarize(mean_prop = mean(data_value)) %>%
-  ggplot(aes(x = year, y = mean_prop, color = state)) +
-  geom_line() +
-  theme(legend.position = "none")
-
-aver_fair = 
-  filter(brfss_df, response == "Fair") %>%
-  group_by(state,year) %>%
-  summarize(mean_prop = mean(data_value)) %>%
-  ggplot(aes(x = year, y = mean_prop, color = state)) +
-  geom_line() +
-  theme(legend.position = "none")
-
-aver_poor = 
-  filter(brfss_df, response == "Poor") %>%
-  group_by(state,year) %>%
-  summarize(mean_prop = mean(data_value)) %>%
-  ggplot(aes(x = year, y = mean_prop, color = state)) +
-  geom_line() +
+  geom_line()+
+  labs(
+    title = "Average proportion",
+    x = "Year",
+    y = "Average proportion"
+  )+
+  facet_wrap(~response)+
+  viridis::scale_color_viridis(discrete=TRUE, name = "State", guide = guide_legend(nrow = 5))+
+  theme_bw()+
   theme(legend.position = "bottom")
-
-aver_exce + aver_very + aver_good + aver_fair + aver_poor
-  
 ```
-
+From the five panel plot, we can see the proportion of each response category over time. "Very good" have the highest proportion among all five responses, and "Poor" have the lowest. For most states, the distributions within each category remains relatively constant.
 
 ## Problem 2 
 
@@ -123,29 +102,35 @@ instacart_df = p8105.datasets::instacart
 
 The dataset is about online purchase order in Instacart. 
 
-There are `r ncol(instacart_df)` variables in the dataset, in which the "eval_set", "aisle", "product_name", "department" are character variables, others are all integer variables.These variables contain the id and category of products in each order, the user and id of an order, the time each order is placed and the time each product is added to the cart and so on.
+There are `r ncol(instacart_df)` variables in the dataset, in which the "eval_set", "aisle", "product_name", "department" are character variables, others are all integer variables.These variables contain the id and category of products in each order, the user and id of an order, the time each order is placed and the time each product is added to the cart, if it is reordered by same user, .
 
-There are `r nrow(instacart_df)` observations in the dataset, each one represents a product in an order. For example, the first row in the dataset illustrate the order id is 1, the product id is 49302. It is the first product added in cart in order 1, and it has been reordered by the user 112108 in the past.This order belongs to the train evaluation set, and is the 4th order of the user. This order is placed on the 4th day of a week, 10 a.m., and it has been 9 days since last order was placed.The product is Bulgarian Yogurt, in dairy and egg department (id: 16), yogurt aisle(id: 120).
+There are `r nrow(instacart_df)` observations in the dataset, each one represents a product in an order. 
+
+For example, the first row in the dataset illustrate the order id is 1, the product id is 49302. It is the first product added in cart in order 1, and it has been reordered by the user 112108 in the past.This order belongs to the train evaluation set, and is the 4th order of the user. This order is placed on the 4th day of a week, 10 a.m., and it has been 9 days since last order was placed.The product is Bulgarian Yogurt, in dairy and egg department (id: 16), yogurt aisle(id: 120).
 
 **2. How many aisles are there, and which aisles are the most items ordered from?**
 ```{r problem 2.2}
-aisle_max = as.data.frame(table(instacart_df$aisle))%>%
-  filter(Freq == max(Freq)) 
+aisle_max = as.data.frame(count(instacart_df, aisle))%>%
+  filter(n == max(n)) 
 ```
 
-There are `r length(unique(instacart_df$aisle))` alsles there.The aisle "`r aisle_max$Var1`" is the most items ordered from.
+There are `r length(unique(instacart_df$aisle))` alsles there.The aisle "`r aisle_max$aisle`" is the most items ordered from. `r aisle_max$n` are from this"
 
 **3. Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.**
-```{r problem 2.3}
+```{r problem 2.3, fig.width=15, fig.height=50}
 instacart_df %>%
   group_by(aisle, department) %>%
   summarize(n = n()) %>%
-  ggplot(aes(x = aisle, y = n))+
-  geom_bar(stat="identity")+
-  facet_wrap( ~ department,ncol = 3,scale = "free")
-
+  ggplot(aes(x= aisle, y= n))+
+  coord_flip()+
+  geom_bar(stat="identity", fill = "#F1C40F") +
+    labs(title = "Number of orders across all aisles in different department", 
+         y = "Number of Orders", 
+         x = "Aisle",
+         cex=3) +
+  facet_wrap( ~ department, ncol = 1, scales ="free" ) 
 ```
-
+This plot shows the number of items ordered in each aisle, and the aisles are classified by department.
 **4. Make a table showing the most popular item aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.**
 ```{r problem 2.4}
 instacart_df %>%
@@ -159,6 +144,8 @@ instacart_df %>%
 **5. Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers.** (i.e. produce a 2 x 7 table)
 ```{r problem 2.5}
 instacart_df %>%
+  mutate(order_dow = ordered(order_dow, levels = c(0:6), labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
+  group_by(product_name, order_dow) %>%
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
   group_by(order_dow, product_name) %>%
   summarize(mean_hour = mean(order_hour_of_day)) %>%
@@ -176,7 +163,8 @@ head(ny_noaa)
 tail(ny_noaa) 
 
 ```
-This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.
+This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.In precipitation, there are `r sum(is.na(ny_noaa$prcp))` missing values. There are also `r sum(is.na(ny_noaa$snow))`, `r sum(is.na(ny_noaa$snwd))`, `r sum(is.na(ny_noaa$tmax))`, `r sum(is.na(ny_noaa$tmin))` missing values respectively in Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature variables. The large number of missing value makes it harder to analysis the data.
+
 
 There are `r nrow(ny_noaa)` observations in `r length(unique(ny_noaa$id))` weather stations during 30 years.
 
@@ -186,11 +174,11 @@ There are `r nrow(ny_noaa)` observations in `r length(unique(ny_noaa$id))` weath
 ny_noaa =
   separate(ny_noaa, date, into = c("year", "month", "date"), sep = "-") %>%
   mutate(tmax = (as.numeric(tmax)/10), tmin = (as.numeric(tmin)/10),
-         month = month.name[as.integer(month)])
+         prcp = prcp / 10,month = month.name[as.integer(month)])
   
 
 ny_noaa_snow =
-  group_by(ny_noaa, snow,) %>%
+  group_by(ny_noaa, snow) %>%
   summarise(n = n()) %>%
   filter(n== max(n))
 ```
@@ -199,29 +187,60 @@ For snowfall, `r ny_noaa_snow$snow` is the most commonly observed value, because
 **3. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
 
 ```{r problem 3.3}
-ny_ave_max = ny_noaa%>%
-  filter(month == "January") %>%
-  group_by(id, year) %>%
-  summarise(ave_max = mean(tmax, na.rm = TRUE)) %>%
-  na.omit() %>%
-  mutate(year=(as.numeric(year)))%>%
-  ggplot(aes(x = year, y = ave_max)) +
-  geom_line(aes(color = id))
-  theme(legend.position = "none")+
-
-
+ny_ave_max = ny_noaa %>%
+  filter(month %in% c("January","July")) %>%
+  group_by(id, year, month) %>%
+  summarise(ave_max = mean(tmax, na.rm = TRUE))%>%
+  ggplot(aes(x = year, y = ave_max, fill = month)) +
+  geom_boxplot()+
+  facet_grid(~month)+
+  labs(
+    title = "Average Max temperature",
+    x = "Year",
+    y = "Avarage Max Temperature in each stations") +
+  scale_x_discrete(breaks = c(1981, 1986, 1991, 1996, 2001, 2006, 2010))+
+  theme_bw()+
+  theme(panel.spacing = unit(1, "lines"))
   
 
-
-
 ```
+
+Based on the 2-panel plot, we can find that the average max temperature in January and in July are obviously different. The max temperature in January is around -10 to 10 , in July is around 20 to 35 . In January, the outliers tend to have higher temperature than whiskers, indicating that sometimes temperature in January are extremely high than average. In July, the outliers tend to have lower temperature than whiskers, indicating that some temperature in July are extremely low than average.
+
 
 **4.Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.**
 
-```{r problem 3.4}
+```{r problem 3.4, warning=FALSE,fig.height=5}
+tmax_tmin = ny_noaa %>%
+  ggplot(aes(x = tmax, y = tmin)) + 
+  geom_hex()+
+  labs(
+    title = "T-max vs T-min",
+    x = "Maxiumum daily temperature (C)",
+    y = "Minimum daily temperature (C)"
+  )+
+  viridis::scale_fill_viridis()+
+  theme_bw()+
+  theme(legend.position = "bottom", legend.key.size=unit(1,'cm'))
 
+snow_fall = ny_noaa %>%
+  filter(snow<100 & snow>0) %>%
+  group_by(year) %>%
+  ggplot(aes(x=snow, y=year))+
+  geom_density_ridges(aes(fill = year),scale = .8) +
+  labs(
+    title = "Snowfall",
+    x = "Snowfall(mm)",
+    y = "Year"
+  )+
+  viridis::scale_fill_viridis(discrete=TRUE, name = "Year", guide = guide_legend(nrow = 8))+
+  scale_x_continuous(breaks = c(0,20,40,60,80,100))+
+  theme_bw()+
+  theme(legend.position = "bottom", legend.key.size=unit(0.5,'cm'))
+  
 
-
-
+tmax_tmin+snow_fall
 ```
+From the T-max vs T-min graph, we can see the relationship between tmax and tmin. The highest density appears in the middle of the plot.
 
+From the snowfall graph, we can find that for most of year, there are 4 snowfall peaks in density, which are around 10, 25, 50 and 70mm. Most of year have similar distribution of snowfall value.
