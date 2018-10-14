@@ -185,7 +185,9 @@ There are `r nrow(ny_noaa)` observations in `r length(unique(ny_noaa$id))` weath
 ```{r problem 3.2}
 ny_noaa =
   separate(ny_noaa, date, into = c("year", "month", "date"), sep = "-") %>%
-  mutate(tmax = (as.numeric(tmax)/10), tmin = (as.numeric(tmin)/10))
+  mutate(tmax = (as.numeric(tmax)/10), tmin = (as.numeric(tmin)/10),
+         month = month.name[as.integer(month)])
+  
 
 ny_noaa_snow =
   group_by(ny_noaa, snow,) %>%
@@ -197,6 +199,18 @@ For snowfall, `r ny_noaa_snow$snow` is the most commonly observed value, because
 **3. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
 
 ```{r problem 3.3}
+ny_ave_max = ny_noaa%>%
+  filter(month == "January") %>%
+  group_by(id, year) %>%
+  summarise(ave_max = mean(tmax, na.rm = TRUE)) %>%
+  na.omit() %>%
+  mutate(year=(as.numeric(year)))%>%
+  ggplot(aes(x = year, y = ave_max)) +
+  geom_line(aes(color = id))
+  theme(legend.position = "none")+
+
+
+  
 
 
 
