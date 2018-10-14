@@ -210,7 +210,7 @@ Based on the 2-panel plot, we can find that the average max temperature in Janua
 
 **4.Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.**
 
-```{r problem 3.4, warning=FALSE,fig.height=5}
+```{r problem 3.4, warning=FALSE,fig.height=8}
 tmax_tmin = ny_noaa %>%
   ggplot(aes(x = tmax, y = tmin)) + 
   geom_hex()+
