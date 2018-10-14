@@ -25,6 +25,7 @@ brfss_df = p8105.datasets::brfss_smart2010 %>%
   arrange(response) 
 
 ```
+
 **2. In 2002, which states were observed at 7 locations?**
 ```{r problem 1.2}
 brfss_state = 
@@ -53,6 +54,7 @@ ggplot(brfss_spa, aes(x = year, y = n_obs, color = state))+
   theme(legend.position = "bottom")
 
 ```
+
 The "spaghetti plot" shows the number of observations in each state from 2002 to 2010. Most of the states have a constant number of observations, but the observation number dramaticly increased in 2007 and 2010, dramaticly decreased in 2008.
 
 **4. Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.**
@@ -91,6 +93,7 @@ brfss_df %>%
   theme_bw()+
   theme(legend.position = "bottom")
 ```
+
 From the five panel plot, we can see the proportion of each response category over time. "Very good" have the highest proportion among all five responses, and "Poor" have the lowest. For most states, the distributions within each category remains relatively constant.
 
 ## Problem 2 
@@ -117,7 +120,7 @@ aisle_max = as.data.frame(count(instacart_df, aisle))%>%
 There are `r length(unique(instacart_df$aisle))` alsles there.The aisle "`r aisle_max$aisle`" is the most items ordered from. `r aisle_max$n` are from this"
 
 **3. Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.**
-```{r problem 2.3,fig.height=50}
+```{r problem 2.3,fig.height=40}
 instacart_df %>%
   group_by(aisle, department) %>%
   summarize(n = n()) %>%
@@ -130,7 +133,9 @@ instacart_df %>%
          cex=3) +
   facet_wrap( ~ department, ncol = 1, scales ="free" ) 
 ```
+
 This plot shows the number of items ordered in each aisle, and the aisles are classified by department.
+
 **4. Make a table showing the most popular item aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.**
 ```{r problem 2.4}
 instacart_df %>%
@@ -163,6 +168,7 @@ head(ny_noaa)
 tail(ny_noaa) 
 
 ```
+
 This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.In precipitation, there are `r sum(is.na(ny_noaa$prcp))` missing values. There are also `r sum(is.na(ny_noaa$snow))`, `r sum(is.na(ny_noaa$snwd))`, `r sum(is.na(ny_noaa$tmax))`, `r sum(is.na(ny_noaa$tmin))` missing values respectively in Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature variables. The large number of missing value makes it harder to analysis the data.
 
 
@@ -182,6 +188,7 @@ ny_noaa_snow =
   summarise(n = n()) %>%
   filter(n== max(n))
 ```
+
 For snowfall, `r ny_noaa_snow$snow` is the most commonly observed value, because most of days in 1 year don't snow.
 
 **3. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
