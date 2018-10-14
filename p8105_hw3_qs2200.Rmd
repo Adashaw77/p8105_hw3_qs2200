@@ -126,12 +126,12 @@ instacart_df %>%
   summarize(n = n()) %>%
   ggplot(aes(x= aisle, y= n))+
   coord_flip()+
-  geom_bar(stat="identity", fill = "#F1C40F") +
+  geom_bar(stat="identity", fill = "#27AE60") +
     labs(title = "Number of orders across all aisles in different department", 
          y = "Number of Orders", 
-         x = "Aisle",
-         cex=3) +
-  facet_wrap( ~ department, ncol = 1, scales ="free" ) 
+         x = "Aisle") +
+  facet_wrap( ~ department, ncol = 1, scales ="free" )+
+  theme_bw()
 ```
 
 This plot shows the number of items ordered in each aisle, and the aisles are classified by department.
@@ -169,7 +169,7 @@ tail(ny_noaa)
 
 ```
 
-This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.In precipitation, there are `r sum(is.na(ny_noaa$prcp))` missing values. There are also `r sum(is.na(ny_noaa$snow))`, `r sum(is.na(ny_noaa$snwd))`, `r sum(is.na(ny_noaa$tmax))`, `r sum(is.na(ny_noaa$tmin))` missing values respectively in Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature variables. The large number of missing value makes it harder to analysis the data.
+This dataset contains climate data in New York from 1981-01-01 to 2010-12-31. It have `r ncol(ny_noaa)` variables, which are weather station id, date of observation, and five core weather variables: Precipitation, Snowfall, Snow depth, Maximum temperature, Minimum temperature.In precipitation, there are `r sum(is.na(ny_noaa$prcp))` missing values. There are also `r sum(is.na(ny_noaa$snow))`, `r sum(is.na(ny_noaa$snwd))`, `r sum(is.na(ny_noaa$tmax))`, `r sum(is.na(ny_noaa$tmin))` missing values respectively in Snowfall, Snow depth, Maximum temperature, Minimum temperature variables. The large number of missing value makes it harder to analysis the data.
 
 
 There are `r nrow(ny_noaa)` observations in `r length(unique(ny_noaa$id))` weather stations during 30 years.
