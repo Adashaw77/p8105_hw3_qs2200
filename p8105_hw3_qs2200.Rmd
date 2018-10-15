@@ -194,7 +194,7 @@ For snowfall, `r ny_noaa_snow$snow` is the most commonly observed value, because
 **3. Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?**
 
 ```{r problem 3.3}
-ny_ave_max = ny_noaa %>%
+ny_noaa %>%
   filter(month %in% c("January","July")) %>%
   group_by(id, year, month) %>%
   summarise(ave_max = mean(tmax, na.rm = TRUE))%>%
